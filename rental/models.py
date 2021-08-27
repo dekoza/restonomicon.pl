@@ -25,6 +25,7 @@ class OwnedModel(models.Model):
 
 class Friend(models.Model):
     name = models.CharField(max_length=100)
+    email = models.EmailField(default="")
 
     objects = FriendQuerySet.as_manager()
 

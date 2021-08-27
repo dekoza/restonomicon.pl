@@ -1,12 +1,16 @@
 import django_filters
 import pendulum
+from django.core.mail import send_mail
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from . import models, serializers
 from .permissions import IsOwner
 
 
-class FriendViewSet(viewsets.ModelViewSet):
+class FriendViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = models.Friend.objects.with_overdue()
     serializer_class = serializers.FriendSerializer
 
@@ -31,7 +35,19 @@ class LoanFilterSet(django_filters.FilterSet):
         return queryset
 
 
-class LoanViewSet(viewsets.ModelViewSet):
+class LoanViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = models.Loan.objects.all()
     serializer_class = serializers.LoanSerializer
     filterset_class = LoanFilterSet
+
+    @action(detail=True, url_path="remind", methods=["post"])
+    def remind_single(self, request, *args, **kwargs):
+        obj = self.get_object()
+        send_mail(
+            subject=f"Proszę oddaj moją własność: {obj.what.name}",
+            message=f'Chyba zapominasz o zwrocie mojej własności: "{obj.what.name}"" pożyczonej dnia {obj.when}. Proszę o zwrot.',
+            from_email="me@example.com",  # tutaj podaj swojego maila
+            recipient_list=[obj.to_who.email],
+            fail_silently=False,
+        )
+        return Response("Email wysłany.")
