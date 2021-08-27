@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "restonomicon-pl"
+version = "0.1.0"
+description = "Repozytorium z przykładowym kodem do poradnika Django RREST Framework"
+authors = ["Dominik Kozaczko <dominik@kozaczko.info>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "restonomicon_pl"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+djangorestframework = "^3.12.4"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^7.26.0"
+pre-commit = "^2.14.0"
+black = "^21.7-beta.0"
+
+[tool.black]
+line-length = 88
+target-version = ['py36']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.cache
+    | \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.tox
+    | \.venv
+    | __pycache__
+    | _build
+    | buck-out
+    | build
+    | dist
+    | docs
+    | .+/migrations
+  )/
+)
+'''
+
+[tool.isort]
+profile="black"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
