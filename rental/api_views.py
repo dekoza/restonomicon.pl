@@ -1,6 +1,7 @@
 import django_filters
 import pendulum
 from django.core.mail import send_mail
+from rest_flex_fields import FlexFieldsModelViewSet
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -35,8 +36,9 @@ class LoanFilterSet(django_filters.FilterSet):
         return queryset
 
 
-class LoanViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
-    queryset = models.Loan.objects.all()
+class LoanViewSet(NestedViewSetMixin, FlexFieldsModelViewSet):
+    queryset = models.Loan.objects.all().select_related("to_who", "what")
+    permit_list_expands = ["what", "to_who"]
     serializer_class = serializers.LoanSerializer
     filterset_class = LoanFilterSet
 
