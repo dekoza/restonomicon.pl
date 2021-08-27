@@ -1,5 +1,19 @@
+import pendulum
 from django.conf import settings
 from django.db import models
+
+
+class FriendQuerySet(models.QuerySet):
+    def with_overdue(self):
+        return self.annotate(
+            ann_overdue=models.Case(
+                models.When(
+                    loan__when__lte=pendulum.now().subtract(months=2), then=True
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField(),
+            )
+        )
 
 
 class OwnedModel(models.Model):
@@ -11,6 +25,16 @@ class OwnedModel(models.Model):
 
 class Friend(models.Model):
     name = models.CharField(max_length=100)
+
+    objects = FriendQuerySet.as_manager()
+
+    @property
+    def has_overdue(self):
+        if hasattr(self, "ann_overdue"):  # jeśli trafimy na obiekt z anotacją
+            return self.ann_overdue
+        return self.loan_set.filter(  # 1
+            returned__isnull=True, when__lte=pendulum.now().subtract(months=2)
+        ).exists()
 
 
 class Belonging(OwnedModel):

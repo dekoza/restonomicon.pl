@@ -5,9 +5,8 @@ from .permissions import IsOwner
 
 
 class FriendViewSet(viewsets.ModelViewSet):
-    queryset = models.Friend.objects.all()
+    queryset = models.Friend.objects.with_overdue()
     serializer_class = serializers.FriendSerializer
-    permission_classes = [IsOwner]
 
 
 class BelongingViewSet(viewsets.ModelViewSet):
