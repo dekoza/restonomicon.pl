@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 
 from . import models, serializers
+from .permissions import IsOwner
 
 
 class FriendViewSet(viewsets.ModelViewSet):
@@ -11,6 +12,7 @@ class FriendViewSet(viewsets.ModelViewSet):
 class BelongingViewSet(viewsets.ModelViewSet):
     queryset = models.Belonging.objects.all()
     serializer_class = serializers.BelongingSerializer
+    permission_classes = [IsOwner]
 
 
 class LoanViewSet(viewsets.ModelViewSet):
